@@ -1,0 +1,82 @@
+/* Colegio Entre Valles: navy #121d30 and slate #454e5c observed on its website.
+   Supporting blues are adaptations for this illustrated guidance experience. */
+:root {
+  --school-navy: #121d30;
+  --school-slate: #454e5c;
+  --school-blue: #24566e;
+  --school-soft: #eaf0f4;
+  --paper: #f7f8fa;
+  --ink: #20354b;
+  --green: #24566e;
+  --muted: #596979;
+  --line: #d9e1e8;
+  color: var(--ink);
+  background: var(--paper);
+}
+::selection { background: #cddfe9; color: var(--school-navy); }
+.site-header { background: var(--school-navy); border-bottom: 3px solid #66889d; }
+.brand { color: #fff; }
+.brand-caption { color: #c2d2df; }
+.brand { flex-direction: column; align-items: flex-start; gap: 5px; padding: 10px 0; }
+.school-logo { display: block; width: 190px; height: auto; }
+.school-logo-caption { padding-left: 4px; color: #c2d2df; font-size: 7px; font-weight: 600; letter-spacing: 1.25px; }
+.main-nav button { color: #c7d3df; }
+.main-nav button:hover, .main-nav .nav-active { background: #2b3f55; color: white; }
+.notebook-nav { color: #edf4f8; border-color: #5a728a; }
+.notebook-nav:hover, .notebook-nav.nav-active { background: #2b3f55; }
+.nav-count { background: #dce9f0; color: var(--school-navy); }
+.page-intro h1, .activity-panel h2, .saved-item h3 { color: var(--ink); }
+.page-intro h1 em { color: var(--school-blue); }
+.eyebrow, .text-button, .outline-button, .official-link, .saved { color: var(--school-blue); }
+.small-line { background: #66889d; }
+.page-intro p, .activity-intro, .traveler-card p, .map-toolbar > span,
+.map-toolbar .text-button, .route-card-title > span:last-child,
+.station-list button, .optional-route, .sidebar-note, .step-count { color: var(--muted); }
+.primary-button { background: var(--school-blue); border-color: var(--school-blue); color: white; }
+.primary-button:hover:not(:disabled) { background: var(--school-navy); border-color: var(--school-navy); }
+.outline-button { border-color: #b7c9d6; }
+.outline-button:hover, .icon-button:hover { background: var(--school-soft); border-color: #6f91a8; color: var(--school-navy); }
+.text-button:hover, .official-link:hover { color: var(--school-navy); }
+.journey-board, .route-card, .traveler-card { border-color: var(--line); }
+.map-toolbar { background: #edf2f6; border-color: var(--line); }
+.live-dot { background: #386b87; box-shadow: 0 0 0 3px #386b871a; }
+.activity-panel, .activity-panel::before { background: #fff; border-color: var(--line); }
+.traveler-card { background: #eaf0f5; }
+.traveler-card .outline-button { background: #f8fafc; border-color: #b7c9d6; }
+.avatar-orbit { background: #dce7ef; border-color: #b9ccd9; }
+.avatar-orbit::after { border-color: #b9ccd9; }
+.route-card { background: #fff; }
+.route-progress { background: #e2e9ef; }
+.route-progress > span { background: var(--school-blue); }
+.station-list .current, .station-list button:hover { color: var(--school-blue); }
+.station-list .current .station-number { background: var(--school-blue); border-color: var(--school-blue); }
+.station-number.done { background: #e5eef4; border-color: #adc4d4; color: var(--school-blue); }
+.scene-station-number { background: var(--school-blue); box-shadow: 0 1px 0 2px #24566e26; }
+.scene-station-label { color: var(--ink); }
+.scene-station:hover .scene-station-number { box-shadow: 0 2px 0 4px #24566e20; }
+.scene-station.is-optional .scene-station-number { color: var(--school-blue); border-color: #92acba; background: #edf3f5; }
+.scene-station.is-active .scene-station-number,
+.scene-station.is-optional.is-active .scene-station-number { background: #ad563b; color: white; }
+.choice-chip.selected, .interest-option.selected, .map-list button.selected, .filter-buttons .selected {
+  background: #eaf1f6; border-color: #7799b1; color: var(--school-blue);
+}
+.choice-chip:hover, .interest-option:hover { border-color: #7799b1; }
+.selected .option-check { background: var(--school-blue); border-color: var(--school-blue); }
+.saved-chips > span, .detail-icon, .saved-item-symbol { background: var(--school-soft); color: var(--school-blue); }
+input[type='checkbox'] { accent-color: var(--school-blue); }
+.plan-checklist input:checked + span { color: #596e80; text-decoration-color: #a4b9c8; }
+.site-footer { border-color: var(--line); color: var(--school-slate); }
+.school-website { display: inline-flex; align-items: center; gap: 6px; color: var(--school-blue); text-underline-offset: 4px; }
+.school-website:hover { color: var(--school-navy); }
+
+@media (max-width: 640px) {
+  .brand { gap: 4px; }
+  .school-logo { width: 170px; }
+  .school-logo-caption { font-size: 6px; letter-spacing: 1.1px; }
+  .main-nav { background: #f7f9fc; border-color: var(--line); }
+  .main-nav button { color: #596979; }
+  .main-nav button:hover, .main-nav .nav-active { background: transparent; color: var(--school-blue); }
+  .main-nav .nav-active::after { background: var(--school-blue); }
+  .notebook-nav { background: #f7f9fc; color: #596979; border-color: var(--line); }
+  .notebook-nav:hover, .notebook-nav.nav-active { background: #eaf0f4; color: var(--school-blue); }
+}

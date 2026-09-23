@@ -1,122 +1,159 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
+import JourneyScene from './components/JourneyScene'
+import Avatar from './components/Avatar'
+import Icon from './components/Icon'
+import type { IconName } from './components/Icon'
+import { institutions, militaryRoutes, supportOptions, glossary, dataReviewedAt, contentNotice } from './data/content'
+import { STORAGE_KEY, freshJourney, restoreJourney, toggleItem, completeStation, jacketColors, skinColors, hairColors, motivationOptions } from './lib/journey'
+import type { JourneyState, StationId } from './lib/journey'
 import './App.css'
+import './school-theme.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+type View = 'journey' | 'explore' | 'notebook' | 'glossary'
+const stations: { id: StationId; title: string; subtitle: string; icon: IconName }[] = [
+  { id: 'start', title: 'Mi punto de partida', subtitle: 'Lo que importa para ti', icon: 'flag' },
+  { id: 'interests', title: 'Lo que me mueve', subtitle: 'Dale espacio a tu curiosidad', icon: 'spark' },
+  { id: 'study', title: 'Destinos para estudiar', subtitle: 'Universidades, IP y CFT', icon: 'map' },
+  { id: 'funding', title: 'Apoyos para el camino', subtitle: 'Financiamiento y beneficios', icon: 'wallet' },
+  { id: 'access', title: 'Otras puertas de entrada', subtitle: 'Programas y acceso especial', icon: 'door' },
+  { id: 'plan', title: 'Mi próximo paso', subtitle: 'Un plan que puede cambiar', icon: 'compass' },
+]
+const interests: { id: string; title: string; detail: string; item: string; icon: IconName }[] = [
+  { id: 'creative', title: 'Crear y diseñar', detail: 'Dar forma a una idea', item: 'Una libreta para tus ideas', icon: 'palette' },
+  { id: 'build', title: 'Construir y resolver', detail: 'Entender cómo funcionan las cosas', item: 'Una herramienta para explorar', icon: 'tool' },
+  { id: 'research', title: 'Investigar y descubrir', detail: 'Hacer preguntas y buscar respuestas', item: 'Una lupa para mirar más allá', icon: 'search' },
+  { id: 'care', title: 'Acompañar a personas', detail: 'Escuchar, enseñar y cuidar', item: 'Un distintivo de comunidad', icon: 'people' },
+  { id: 'nature', title: 'Conectar con la naturaleza', detail: 'Conocer y cuidar nuestro entorno', item: 'Una hoja para recordar tu entorno', icon: 'leaf' },
+  { id: 'organize', title: 'Organizar y emprender', detail: 'Convertir proyectos en acciones', item: 'Una brújula para nuevos proyectos', icon: 'compass' },
+]
+const motivations = motivationOptions
+const concerns = ['Todavía no sé qué me interesa', 'Me preocupa cómo pagarlo', 'No entiendo los requisitos', 'Quiero estudiar cerca de casa', 'Prefiero seguir explorando']
+const concernHelp = ['Puedes partir por las actividades que te dan curiosidad. No necesitas elegir una carrera hoy.', 'En Apoyos para el camino podrás conocer beneficios y los pasos para investigarlos.', 'Tu Brújula explica los conceptos; cada institución tiene sus propios requisitos.', 'En Destinos para estudiar encontrarás una selección de instituciones con presencia en la región.', 'Está bien. Puedes regresar a esta pregunta cuando quieras.']
+const planSteps = [{ id: 'compare', label: 'Comparar dos alternativas que me interesen' }, { id: 'requirements', label: 'Revisar sus requisitos en la fuente oficial' }, { id: 'support', label: 'Investigar un apoyo o una vía de acceso' }, { id: 'talk', label: 'Conversar mis dudas con orientación o alguien de confianza' }]
+function loadState() { try { return restoreJourney(localStorage.getItem(STORAGE_KEY)) } catch { return freshJourney() } }
+function OfficialLink({ url, children = 'Ver información oficial' }: { url: string; children?: ReactNode }) {
+  return <a className="official-link" href={url} target="_blank" rel="noreferrer">{children}<Icon name="external" size={15}/><span className="sr-only"> (abre otra pestaña)</span></a>
+}
+function Modal({ title, onClose, children, wide = false }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
+  const ref = useRef<HTMLDialogElement>(null)
+  useEffect(() => { const previous = document.activeElement as HTMLElement | null; ref.current?.showModal(); return () => { previous?.focus() } }, [])
+  return <dialog ref={ref} className={`modal ${wide ? 'modal-wide' : ''}`} onCancel={onClose} aria-labelledby="modal-title"><div className="modal-heading"><h2 id="modal-title">{title}</h2><button className="icon-button" aria-label="Cerrar ventana" onClick={onClose}><Icon name="close"/></button></div>{children}</dialog>
 }
 
-export default App
+export default function App() {
+  const [state, setState] = useState<JourneyState>(loadState)
+  const [view, setView] = useState<View>('journey')
+  const [avatarOpen, setAvatarOpen] = useState(false)
+  const [resetOpen, setResetOpen] = useState(false)
+  const [compareOpen, setCompareOpen] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exportCopyStatus, setExportCopyStatus] = useState('')
+  const [comparison, setComparison] = useState<string[]>([])
+  const [query, setQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState('Todas')
+  const [glossaryQuery, setGlossaryQuery] = useState('')
+  const [draftInterests, setDraftInterests] = useState<string[] | null>(null)
+  const [toast, setToast] = useState('')
+  const [storageAvailable, setStorageAvailable] = useState(true)
+  const [mapList, setMapList] = useState(false)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const activityRef = useRef<HTMLElement>(null)
+  const previousActivity = useRef(`${state.station}:${state.startStep}`)
+  const shouldScrollActivity = useRef(false)
+  useEffect(() => {
+    let available = true
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) } catch { available = false }
+    // This state reports an external storage operation, including private-browser failures.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setStorageAvailable(available)
+  }, [state])
+  useEffect(() => {
+    const key = `${state.station}:${state.startStep}`
+    if (key === previousActivity.current) return
+    previousActivity.current = key
+    const heading = activityRef.current?.querySelector('h2')
+    if (!heading) return
+    heading.tabIndex = -1
+    heading.focus({ preventScroll: true })
+    if (shouldScrollActivity.current) {
+      const bounds = heading.getBoundingClientRect()
+      if (bounds.top < 0 || bounds.bottom > window.innerHeight - 120) {
+        activityRef.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+      }
+    }
+    shouldScrollActivity.current = false
+  }, [state.station, state.startStep])
+  useEffect(() => { if (!toast) return; const timer = window.setTimeout(() => setToast(''), 4000); return () => clearTimeout(timer) }, [toast])
+  const patch = (updates: Partial<JourneyState>) => { if (updates.startStep !== undefined) shouldScrollActivity.current = true; setState(previous => ({ ...previous, ...updates })) }
+  const navigate = (next: View) => { setView(next); window.scrollTo({ top: 0, behavior: 'instant' }); requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true })) }
+  const selectStation = (station: string) => { patch({ station: station as StationId }); setDraftInterests(null); if (view !== 'journey') navigate('journey') }
+  const finish = (next?: StationId) => { shouldScrollActivity.current = true; setState(previous => ({ ...completeStation(previous, previous.station), ...(next ? { station: next } : {}) })) }
+  const toggleFavorite = (id: string) => { const saved = state.favorites.includes(id); patch({ favorites: toggleItem(state.favorites, id) }); setToast(saved ? 'Opción retirada de tu bitácora' : 'Un nuevo destino en tu bitácora') }
+  const toggleSupport = (id: string) => { patch({ supports: toggleItem(state.supports, id) }); setToast(state.supports.includes(id) ? 'Apoyo retirado de tu bitácora' : 'Apoyo guardado para investigar') }
+  const active = stations.find(s => s.id === state.station) ?? { id: 'service', title: 'Vocación de servicio', subtitle: 'Rutas militares y policiales', icon: 'anchor' as IconName }
+  const shownInterests = state.station === 'interests' && draftInterests !== null ? draftInterests : state.interests
+  const mainComplete = stations.filter(s => state.completed.includes(s.id)).length
+  const favoriteInstitutions = institutions.filter(item => state.favorites.includes(item.id))
+  const favoritePathways = [...new Set(favoriteInstitutions.map(item => item.type))]
+  const savedSupports = supportOptions.filter(item => state.supports.includes(item.id))
+  const normalized = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  const filteredInstitutions = institutions.filter(item => (typeFilter === 'Todas' || item.type === typeFilter) && normalized([item.name, item.shortName, item.location, ...item.areas].join(' ')).includes(normalized(query)))
+  const filteredGlossary = glossary.filter(item => normalized(`${item.term} ${item.short} ${item.description}`).includes(normalized(glossaryQuery)))
+  const changeComparison = (id: string) => { if (comparison.includes(id)) setComparison(comparison.filter(value => value !== id)); else if (comparison.length < 3) setComparison([...comparison, id]); else setToast('Puedes comparar hasta tres instituciones. Retira una para agregar otra.') }
+  const notebookText = () => {
+    const text = ['ENTREVALLES · MI BITÁCORA', `Guardada el ${new Date().toLocaleDateString('es-CL')}`, '', 'MI PUNTO DE PARTIDA', ...state.motivations.map(m => `• ${m}`), state.concern ? `Mi duda: ${state.concern}` : '', '', 'MIS INTERESES', ...interests.filter(i => state.interests.includes(i.id)).map(i => `• ${i.title}`), '', 'DESTINOS POR EXPLORAR', ...favoriteInstitutions.flatMap(i => [`• ${i.name} — ${i.location}`, i.url]), '', 'APOYOS POR INVESTIGAR', ...savedSupports.flatMap(i => [`• ${i.name}`, i.url]), '', 'MIS PRÓXIMOS PASOS', ...planSteps.map(s => `${state.checkedSteps.includes(s.id) ? '[x]' : '[ ]'} ${s.label}`), '', 'MIS NOTAS', state.note || 'Aún no agrego notas.', '', 'Revisa requisitos, fechas y convocatorias en las fuentes oficiales.'].join('\n')
+    return text
+  }
+  const exportNotebook = () => { setResetOpen(false); setExportCopyStatus(''); setExportOpen(true) }
+
+  function renderSupport(kind: 'funding' | 'access') {
+    return <div className="support-list">{supportOptions.filter(item => kind === 'funding' ? item.kind === 'Financiamiento' : item.kind !== 'Financiamiento').map(item => <details className="content-detail" key={item.id}>
+      <summary><span className="detail-icon"><Icon name={kind === 'funding' ? 'wallet' : 'door'}/></span><span><span className="eyebrow small">{item.kind}</span><strong>{item.name}</strong></span><Icon name="chevron" size={18}/></summary>
+      <div className="detail-body"><p>{item.description}</p><ol>{item.steps.map(step => <li key={step}>{step}</li>)}</ol><div className="detail-actions"><OfficialLink url={item.url}/><button className={`text-button ${state.supports.includes(item.id) ? 'saved' : ''}`} onClick={() => toggleSupport(item.id)}><Icon name={state.supports.includes(item.id) ? 'check' : 'book'} size={17}/>{state.supports.includes(item.id) ? 'Guardado' : 'Guardar para revisar'}</button></div></div>
+    </details>)}</div>
+  }
+  function renderActivity() {
+    if (state.station === 'start') return <>
+      <div className="activity-topline"><span className="eyebrow">MI PUNTO DE PARTIDA</span><span className="step-count">Parada {state.startStep + 1} de 3</span></div>
+      {state.startStep === 0 && <><h2>¿Qué te gustaría encontrar en tu camino?</h2><p className="activity-intro">Estudiar puede abrir oportunidades, ayudarte a aprender un oficio y dar forma a tus proyectos. Empecemos por lo que te importa. Elige hasta dos.</p><div className="motivation-options">{motivations.map((m, index) => <button key={m} aria-pressed={state.motivations.includes(m)} className={`choice-chip ${state.motivations.includes(m) ? 'selected' : ''}`} onClick={() => { if (!state.motivations.includes(m) && state.motivations.length >= 2) { setToast('Elige hasta dos motivaciones. Puedes cambiar una de las seleccionadas.'); return } patch({ motivations: toggleItem(state.motivations, m) }) }}><Icon name={(['bulb', 'tool', 'people', 'flag', 'compass'] as IconName[])[index]} size={18}/>{m}{state.motivations.includes(m) && <Icon name="check" size={16}/>}</button>)}</div><div className="activity-actions"><button className="primary-button" onClick={() => patch({ startStep: 1 })}>{state.motivations.length ? 'Guardar y avanzar' : 'Comenzar mi camino'}<Icon name="arrow" size={18}/></button><button className="text-button" onClick={() => patch({ startStep: 1 })}>Continuar sin responder</button><span className="gentle-note">A tu ritmo. Sin respuestas correctas.</span></div></>}
+      {state.startStep === 1 && <><h2>¿Hay algo que hoy te preocupe?</h2><p className="activity-intro">A veces, una buena pregunta es el mejor punto de partida.</p><div className="motivation-options">{concerns.map(c => <button key={c} aria-pressed={state.concern === c} className={`choice-chip ${state.concern === c ? 'selected' : ''}`} onClick={() => patch({ concern: state.concern === c ? '' : c })}>{c}{state.concern === c && <Icon name="check" size={16}/>}</button>)}</div>{state.concern && <p className="insight"><Icon name="bulb"/>{concernHelp[concerns.indexOf(state.concern)] || 'Puedes llevar esta duda a orientación.'}</p>}<div className="activity-actions"><button className="primary-button" onClick={() => patch({ startStep: 2 })}>Seguir mi recorrido<Icon name="arrow" size={18}/></button><button className="text-button" onClick={() => patch({ startStep: 0 })}>Volver</button></div></>}
+      {state.startStep === 2 && <><h2>No necesitas tener todo decidido.</h2><p className="activity-intro">Ya tienes un punto de partida. Ahora vamos a explorar las actividades que te dan curiosidad; puedes cambiar de idea tantas veces como lo necesites.</p>{state.motivations.length > 0 && <div className="saved-chips">{state.motivations.map(m => <span key={m}><Icon name="check" size={14}/>{m}</span>)}</div>}<div className="activity-actions"><button className="primary-button" onClick={() => finish('interests')}>Descubrir lo que me mueve<Icon name="arrow" size={18}/></button><button className="text-button" onClick={() => patch({ startStep: 0 })}>Editar mi punto de partida</button></div></>}
+    </>
+    if (state.station === 'interests') return <><div className="activity-topline"><span className="eyebrow">LO QUE ME MUEVE</span><span className="step-count">Tu mochila, tus intereses</span></div><h2>¿Qué te gustaría probar primero?</h2><p className="activity-intro">Elige lo que te dé curiosidad. Puedes combinar intereses y descubrir cómo cambia tu personaje.</p><div className="interest-grid">{interests.map(i => <button aria-label={`${i.title}. ${i.detail}`} aria-pressed={shownInterests.includes(i.id)} key={i.id} className={`interest-option ${shownInterests.includes(i.id) ? 'selected' : ''}`} onClick={() => setDraftInterests(toggleItem(shownInterests, i.id))}><span className="interest-icon"><Icon name={i.icon} size={25}/></span><span><strong>{i.title}</strong><small>{i.detail}</small></span><span className="option-check">{shownInterests.includes(i.id) && <Icon name="check" size={13}/>}</span></button>)}</div>{draftInterests !== null && <p className="insight"><Icon name="spark"/><span><strong>Vista previa:</strong> {shownInterests.length ? interests.filter(i => shownInterests.includes(i.id)).map(i => i.item.toLowerCase()).join(' · ') : 'una mochila lista para nuevas ideas'}. Guarda para conservar los cambios.</span></p>}<div className="activity-actions">{draftInterests !== null ? <><button className="primary-button" onClick={() => { patch({ interests: draftInterests }); setDraftInterests(null); setToast('Tu personaje ya tiene algo de ti. Intereses guardados.') }}>Guardar mis intereses<Icon name="check" size={18}/></button><button className="text-button" onClick={() => setDraftInterests(null)}>Cancelar cambios</button></> : <><button className="primary-button" onClick={() => finish('study')}>Explorar destinos<Icon name="arrow" size={18}/></button><span className="gentle-note">Tus intereses son pistas, no un diagnóstico vocacional.</span></>}</div></>
+    if (state.station === 'study') return <><span className="eyebrow">DESTINOS PARA ESTUDIAR</span><h2>Muchos caminos. Un primer paso.</h2><p className="activity-intro">Las universidades, los institutos profesionales y los centros de formación técnica ofrecen alternativas distintas. Mira sus áreas, explora sus sedes y guarda las que quieras investigar.</p><div className="route-types"><div><span>01</span><strong>Universidades</strong><p>Formación profesional, licenciaturas e investigación.</p></div><div><span>02</span><strong>Institutos profesionales</strong><p>Carreras profesionales y técnicas vinculadas al trabajo.</p></div><div><span>03</span><strong>Centros de formación técnica</strong><p>Formación técnica de nivel superior.</p></div></div><div className="activity-actions"><button className="primary-button" onClick={() => { setState(p => completeStation(p, 'study')); navigate('explore') }}>Explorar instituciones<Icon name="arrow" size={18}/></button><button className="text-button" onClick={() => selectStation('service')}><Icon name="anchor" size={17}/>Conocer la ruta de servicio</button><button className="text-button" onClick={() => finish('funding')}>Continuar a los apoyos</button></div></>
+    if (state.station === 'service') return <><span className="eyebrow">DESVÍO OPCIONAL · VOCACIÓN DE SERVICIO</span><h2>Otra forma de construir tu camino.</h2><p className="activity-intro">Conoce las rutas militares y policiales, sus funciones y su vida de formación. Cada institución tiene vías y requisitos propios; revisa las bases de su convocatoria.</p><div className="support-list">{militaryRoutes.map(item => <details className="content-detail" key={item.id}><summary><span className="detail-icon"><Icon name="anchor"/></span><strong>{item.name}</strong><Icon name="chevron" size={18}/></summary><div className="detail-body"><p>{item.description}</p>{item.paths.map(path => <div className="military-path" key={path.name}><h3>{path.name}</h3><p>{path.description}</p><OfficialLink url={path.url}>Conocer esta vía</OfficialLink></div>)}</div></details>)}</div><div className="activity-actions"><button className="primary-button" onClick={() => finish('funding')}>Volver al camino principal<Icon name="arrow" size={18}/></button></div></>
+    if (state.station === 'funding' || state.station === 'access') return <><span className="eyebrow">{state.station === 'funding' ? 'APOYOS PARA EL CAMINO' : 'OTRAS PUERTAS DE ENTRADA'}</span><h2>{state.station === 'funding' ? 'No tienes que resolverlo todo a solas.' : 'Hay más de una puerta de entrada.'}</h2><p className="activity-intro">{state.station === 'funding' ? 'Conoce las diferencias entre el formulario FUAS, la gratuidad y las becas. Guarda los apoyos que quieras revisar y consulta sus condiciones oficiales.' : 'Explora programas de preparación, acompañamiento y admisión especial. Cada oportunidad tiene su propia convocatoria y participar no garantiza un cupo.'}</p>{renderSupport(state.station)}<div className="activity-actions"><button className="primary-button" onClick={() => finish(state.station === 'funding' ? 'access' : 'plan')}>Continuar mi camino<Icon name="arrow" size={18}/></button></div><p className="source-note">{contentNotice}</p></>
+    return <><span className="eyebrow">MI PRÓXIMO PASO</span><h2>Un camino propio empieza con algo pequeño.</h2><p className="activity-intro">Reúne tus ideas, compara alternativas y elige qué investigar después. Tu plan puede cambiar contigo.</p><div className="plan-checklist">{planSteps.map(step => <label key={step.id}><input type="checkbox" checked={state.checkedSteps.includes(step.id)} onChange={() => patch({ checkedSteps: toggleItem(state.checkedSteps, step.id) })}/><span>{step.label}</span></label>)}</div><div className="activity-actions"><button className="primary-button" onClick={() => { finish(); navigate('notebook') }}>Abrir mi bitácora<Icon name="book" size={18}/></button><button className="text-button" onClick={exportNotebook}><Icon name="download" size={17}/>Descargar mi plan</button></div></>
+  }
+
+  return <>
+    <a className="skip-link" href="#main-content">Saltar al contenido</a>
+    <header className="site-header"><div className="header-inner"><button className="brand" onClick={() => navigate('journey')} aria-label="EntreValles, volver a mi camino"><img className="school-logo" src="/colegio-entre-valles.png" alt="Colegio Entre Valles"/><small className="school-logo-caption">ORIENTACIÓN · TU PRÓXIMO PASO</small></button><nav className="main-nav" aria-label="Navegación principal">{([{ id: 'journey', name: 'Mi camino', icon: 'map' }, { id: 'explore', name: 'Explorar', icon: 'compass' }, { id: 'glossary', name: 'Brújula', icon: 'bulb' }] as { id: View; name: string; icon: IconName }[]).map(item => <button key={item.id} aria-current={view === item.id ? 'page' : undefined} className={view === item.id ? 'nav-active' : ''} onClick={() => navigate(item.id)}><Icon name={item.icon} size={18}/><span>{item.name}</span></button>)}</nav><button aria-label="Mi bitácora" className={`notebook-nav ${view === 'notebook' ? 'nav-active' : ''}`} onClick={() => navigate('notebook')} aria-current={view === 'notebook' ? 'page' : undefined}><Icon name="book" size={18}/><span>Mi bitácora</span>{favoriteInstitutions.length > 0 && <span className="nav-count">{favoriteInstitutions.length}</span>}</button></div></header>
+    <main id="main-content" className="page-shell">
+      {view === 'journey' && <>
+        <section className="page-intro"><div><div className="eyebrow intro-eyebrow"><span className="small-line"/>COLEGIO ENTRE VALLES · TU PRÓXIMO PASO</div><h1 ref={headingRef} tabIndex={-1}>No hay un solo camino.<br/><em>Hay uno que vas construyendo tú.</em></h1><p>Explora, descubre y encuentra tu próximo paso. Sin tener todo decidido.</p></div><div className="intro-stamp"><Icon name="sun" size={25}/><span>Tu aventura<br/><strong>empieza aquí.</strong></span><svg viewBox="0 0 80 34" width="76" height="32" aria-hidden="true"><path d="M3 5c18 28 56 21 64 3m-12 5 12-5 6 10" stroke="currentColor" fill="none" strokeWidth="1.5"/></svg></div></section>
+        <div className="journey-layout"><section className="journey-board" aria-label="Mapa y actividades"><div className="map-toolbar"><span><span className="live-dot"/>{active.title}</span><button className="text-button" aria-pressed={mapList} onClick={() => setMapList(!mapList)}><Icon name={mapList ? 'map' : 'list'} size={16}/>{mapList ? 'Ver paisaje' : 'Ver como lista'}</button></div>{mapList ? <div className="map-list">{[...stations, { id: 'service' as StationId, title: 'Vocación de servicio', subtitle: 'Ruta opcional', icon: 'anchor' as IconName }].map(s => <button key={s.id} onClick={() => selectStation(s.id)} className={state.station === s.id ? 'selected' : ''}><Icon name={s.icon}/><span><strong>{s.title}</strong><small>{s.subtitle}</small></span>{state.completed.includes(s.id) ? <Icon name="check"/> : <Icon name="arrow"/>}</button>)}</div> : <div className="scene-container"><JourneyScene pathways={favoritePathways} activeStation={state.station} completed={state.completed} onSelect={selectStation} appearance={state.appearance} interests={shownInterests}/><div className="scene-caption"><Icon name="pin" size={13}/>Un paisaje inspirado en Valparaíso</div>{draftInterests !== null && state.station === 'interests' && <span className="preview-badge">Vista previa del personaje</span>}</div>}<section ref={activityRef} className="activity-panel" aria-label={active.title}>{renderActivity()}</section></section>
+          <aside className="journey-sidebar"><section className="traveler-card"><div className="traveler-card-heading"><span className="eyebrow">QUIEN RECORRE EL CAMINO</span><button className="icon-button small-icon" aria-label="Personalizar mi personaje" onClick={() => setAvatarOpen(true)}><Icon name="edit" size={16}/></button></div><div className="avatar-preview"><div className="avatar-orbit"/><Avatar pathways={favoritePathways} appearance={state.appearance} interests={shownInterests} size={100}/><span className="avatar-spark one">✦</span><span className="avatar-spark two">✧</span></div><h2>Tu historia va contigo.</h2><p>{state.interests.length ? `${state.interests.length} ${state.interests.length === 1 ? 'interés guardado' : 'intereses guardados'}. Muchas formas de explorar.` : 'Cada descubrimiento deja algo en tu mochila.'}</p><button className="outline-button compact" onClick={() => setAvatarOpen(true)}>Mi personaje<Icon name="edit" size={14}/></button></section>
+          <section className="route-card"><div className="route-card-title"><span className="eyebrow">TU RECORRIDO</span><span>{mainComplete} / 6</span></div><div className="route-progress" role="progressbar" aria-label="Estaciones principales exploradas" aria-valuenow={mainComplete} aria-valuemin={0} aria-valuemax={6}><span style={{ width: `${mainComplete / 6 * 100}%` }}/></div><ol className="station-list">{stations.map((s, index) => <li key={s.id}><button aria-current={state.station === s.id ? 'step' : undefined} className={state.station === s.id ? 'current' : ''} onClick={() => selectStation(s.id)}><span className={`station-number ${state.completed.includes(s.id) ? 'done' : ''}`}>{state.completed.includes(s.id) ? <Icon name="check" size={12}/> : `0${index + 1}`}</span><span>{s.title}</span></button></li>)}</ol><button className={`optional-route ${state.station === 'service' ? 'selected' : ''}`} onClick={() => selectStation('service')}><Icon name="anchor" size={16}/><span>Vocación de servicio<small>Un desvío para explorar</small></span><Icon name="chevron" size={14}/></button></section><div className="sidebar-note"><Icon name="compass" size={23}/><p>Este mapa es tuyo.<br/><strong>Puedes cambiar de rumbo.</strong></p></div></aside></div>
+        <div className="below-map"><span><Icon name="check" size={15}/>Todas las rutas están abiertas</span><span><Icon name="book" size={15}/>{storageAvailable ? 'Tu avance se guarda en este dispositivo' : 'Guardado local no disponible; descarga tu bitácora'}</span><label>Estoy en <select aria-label="Mi curso" value={state.course} onChange={e => patch({ course: e.target.value })}><option value="">Modo exploración</option><option>3° medio</option><option>4° medio</option></select></label></div>
+      </>}
+
+      {view === 'explore' && <>
+        <section className="page-intro inner-intro"><div><span className="eyebrow">DESTINOS PARA ESTUDIAR</span><h1 ref={headingRef} tabIndex={-1}>Abre el mapa.<br/><em>Amplía tus posibilidades.</em></h1><p>Una selección inicial de instituciones con presencia en la Región de Valparaíso.</p></div><span className="big-section-icon"><Icon name="compass" size={62}/></span></section><div className="catalog-toolbar"><label className="search-field"><Icon name="search"/><input aria-label="Buscar instituciones, áreas o comunas" placeholder="Busca una institución, un área o una comuna…" value={query} onChange={e => setQuery(e.target.value)}/>{query && <button className="icon-button small-icon" aria-label="Limpiar búsqueda" onClick={() => setQuery('')}><Icon name="close" size={16}/></button>}</label><div className="filter-buttons" aria-label="Tipo de institución">{['Todas', 'Universidad', 'IP', 'CFT'].map(type => <button aria-pressed={typeFilter === type} key={type} className={typeFilter === type ? 'selected' : ''} onClick={() => setTypeFilter(type)}>{type === 'Universidad' ? 'Universidades' : type}</button>)}</div></div><div className="catalog-meta"><span>{filteredInstitutions.length} instituciones para explorar</span><span><Icon name="pin" size={14}/>Región de Valparaíso</span></div><div className="institution-grid">{filteredInstitutions.map(item => <article className="institution-card" key={item.id}><div className="institution-top"><span className="institution-monogram" style={{ background: item.color || '#e8ece1' }}>{item.shortName}</span><button className={`icon-button favorite-button ${state.favorites.includes(item.id) ? 'is-favorite' : ''}`} aria-label={`${state.favorites.includes(item.id) ? 'Quitar' : 'Guardar'} ${item.name}`} aria-pressed={state.favorites.includes(item.id)} onClick={() => toggleFavorite(item.id)}><Icon name="heart"/></button></div><span className="type-label">{item.type}</span><h2>{item.name}</h2><p className="institution-location"><Icon name="pin" size={14}/>{item.location}</p><p className="institution-description">{item.description}</p><div className="area-tags">{item.areas.slice(0, 3).map(area => <span key={area}>{area}</span>)}</div><div className="institution-bottom"><OfficialLink url={item.url}>Explorar oferta</OfficialLink><label className="compare-check"><input type="checkbox" checked={comparison.includes(item.id)} onChange={() => changeComparison(item.id)}/>Comparar</label></div></article>)}</div>{filteredInstitutions.length === 0 && <div className="empty-state"><Icon name="search" size={34}/><h2>Probemos otro camino.</h2><p>No encontramos coincidencias en esta selección inicial.</p><button className="outline-button" onClick={() => { setQuery(''); setTypeFilter('Todas') }}>Ver todas las opciones</button></div>}<p className="source-note">La oferta de carreras depende de la sede. Esta selección no es un catálogo exhaustivo ni una clasificación. Fuentes revisadas: {dataReviewedAt}. <a href="https://acceso.mineduc.cl/" target="_blank" rel="noreferrer">Explorar también en Acceso Mineduc ↗</a></p>{comparison.length > 0 && <div className="comparison-tray"><span><Icon name="compare"/>{comparison.length} de 3 opciones seleccionadas</span><button className="text-button" onClick={() => setComparison([])}>Limpiar</button><button className="primary-button compact" disabled={comparison.length < 2} onClick={() => setCompareOpen(true)}>Comparar opciones<Icon name="arrow" size={17}/></button></div>}
+      </>}
+      {view === 'glossary' && <>
+        <section className="page-intro inner-intro"><div><span className="eyebrow">TU BRÚJULA</span><h1 ref={headingRef} tabIndex={-1}>Para entender el camino,<br/><em>palabra por palabra.</em></h1><p>Conceptos que vas a encontrar al explorar tus próximas opciones.</p></div><span className="big-section-icon"><Icon name="bulb" size={60}/></span></section><label className="search-field glossary-search"><Icon name="search"/><input aria-label="Buscar un concepto" placeholder="¿NEM, ranking, PAES…?" value={glossaryQuery} onChange={e => setGlossaryQuery(e.target.value)}/></label><div className="glossary-grid">{filteredGlossary.map(item => <details className="glossary-card" key={item.term}><summary><span><strong>{item.term}</strong><small>{item.short}</small></span><Icon name="chevron" size={18}/></summary><div><p>{item.description}</p><OfficialLink url={item.url}>{item.linkLabel ?? 'Ir a la fuente'}</OfficialLink></div></details>)}</div>{!filteredGlossary.length && <div className="empty-state"><p>No encontramos ese concepto. Prueba una palabra más corta.</p><button className="text-button" onClick={() => setGlossaryQuery('')}>Mostrar todos</button></div>}<p className="source-note">Los criterios y procesos pueden cambiar. Consulta la información oficial del año en que postularás.</p>
+      </>}
+      {view === 'notebook' && <>
+        <section className="page-intro inner-intro"><div><span className="eyebrow">MI BITÁCORA</span><h1 ref={headingRef} tabIndex={-1}>Lo que descubres hoy,<br/><em>te acompaña mañana.</em></h1><p>Tus ideas, tus posibilidades y un próximo paso. Todo en un mismo lugar.</p></div><button className="outline-button" onClick={exportNotebook}><Icon name="download" size={18}/>Descargar bitácora</button></section><div className="notebook-layout"><div className="notebook-main"><section className="notebook-section"><span className="eyebrow">01 · MI PUNTO DE PARTIDA</span><h2>Esto me mueve.</h2>{state.motivations.length > 0 ? <div className="saved-chips">{state.motivations.map(m => <span key={m}><Icon name="check" size={14}/>{m}</span>)}</div> : <p className="muted">Todavía no has guardado motivaciones. Puedes empezar cuando quieras.</p>}{state.concern && <p className="notebook-concern"><strong>Una duda que quiero resolver:</strong> {state.concern}</p>}<div className="saved-chips interests-chips">{interests.filter(i => state.interests.includes(i.id)).map(i => <span key={i.id}><Icon name={i.icon} size={16}/>{i.title}</span>)}</div><button className="text-button" onClick={() => selectStation('interests')}>Explorar mis intereses<Icon name="arrow" size={16}/></button></section><section className="notebook-section"><span className="eyebrow">02 · POSIBLES DESTINOS</span><h2>Opciones que quiero conocer.</h2>{favoriteInstitutions.length ? favoriteInstitutions.map(item => <div className="saved-item" key={item.id}><span className="saved-item-symbol"><Icon name="map"/></span><div><h3>{item.name}</h3><small>{item.type} · {item.location}</small><OfficialLink url={item.url}/></div><button className="icon-button" aria-label={`Quitar ${item.name} de mi bitácora`} onClick={() => toggleFavorite(item.id)}><Icon name="close" size={17}/></button></div>) : <p className="muted">Guarda instituciones con el corazón y aparecerán aquí.</p>}<button className="text-button" onClick={() => navigate('explore')}>Buscar destinos<Icon name="arrow" size={16}/></button></section><section className="notebook-section"><span className="eyebrow">03 · APOYOS POR INVESTIGAR</span><h2>Una ayuda para el camino.</h2>{savedSupports.length ? savedSupports.map(item => <div className="saved-item" key={item.id}><span className="saved-item-symbol"><Icon name="wallet"/></span><div><h3>{item.name}</h3><OfficialLink url={item.url}/></div><button className="icon-button" aria-label={`Quitar ${item.name}`} onClick={() => toggleSupport(item.id)}><Icon name="close" size={17}/></button></div>) : <p className="muted">Aquí aparecerán los beneficios o programas que guardes para revisar.</p>}<button className="text-button" onClick={() => selectStation('funding')}>Conocer apoyos<Icon name="arrow" size={16}/></button></section><section className="notebook-section"><label htmlFor="notebook-note" className="eyebrow">04 · MIS IDEAS Y PREGUNTAS</label><h2>Deja una nota para tu yo de mañana.</h2><textarea id="notebook-note" maxLength={2000} value={state.note} onChange={e => patch({ note: e.target.value })} placeholder="Algo que quiero preguntar, una carrera que me llamó la atención, una idea…"/><span className="character-count">{state.note.length} / 2000</span></section></div><aside className="notebook-aside"><div className="notebook-person"><Avatar pathways={favoritePathways} appearance={state.appearance} interests={state.interests} size={140}/><h2>Este es tu comienzo.</h2><p>No hace falta tener todas las respuestas para dar el siguiente paso.</p></div><section className="plan-card"><span className="eyebrow">MIS PRÓXIMOS PASOS</span><div className="plan-checklist">{planSteps.map(step => <label key={step.id}><input type="checkbox" checked={state.checkedSteps.includes(step.id)} onChange={() => patch({ checkedSteps: toggleItem(state.checkedSteps, step.id) })}/><span>{step.label}</span></label>)}</div></section><div className="privacy-note"><Icon name="book" size={18}/><p>{storageAvailable ? 'Esta bitácora se guarda en este navegador. Si usas un computador compartido, descárgala y borra tu recorrido al terminar.' : 'El navegador no permite guardar tu avance. Descarga tu bitácora antes de salir.'}</p></div><button className="text-button reset-button" onClick={() => setResetOpen(true)}><Icon name="reset" size={15}/>Borrar mi recorrido</button></aside></div>
+      </>}
+    </main>
+    <footer className="site-footer"><span className="footer-brand">EntreValles<span>Hecho para descubrir posibilidades.</span></span><span>Región de Valparaíso, Chile <span className="footer-star">✳</span><a className="school-website" href="https://www.colegioentrevalles.cl/web/" target="_blank" rel="noreferrer">Sitio del colegio<Icon name="external" size={13}/><span className="sr-only"> (abre otra pestaña)</span></a></span></footer>
+    <div className="toast-container" role="status" aria-live="polite">{toast && <div className="toast"><Icon name="check" size={18}/>{toast}</div>}</div>
+    {avatarOpen && <Modal title="Dale tu toque al camino." onClose={() => setAvatarOpen(false)}><p className="modal-intro">Tu apariencia la eliges tú. Tus intereses suman pequeños detalles a tu mochila.</p><div className="customize-preview"><Avatar pathways={favoritePathways} appearance={state.appearance} interests={state.interests} size={150}/><div>{state.interests.length ? interests.filter(i => state.interests.includes(i.id)).map(i => <span key={i.id}><Icon name={i.icon} size={17}/>{i.item}</span>) : <p>Tu mochila está lista para lo que viene.</p>}</div></div>{([{ name: 'Chaqueta', key: 'jacket', colors: jacketColors, labels: ['Terracota', 'Verde mar', 'Mostaza', 'Lavanda'] }, { name: 'Tono de piel', key: 'skin', colors: skinColors, labels: ['Claro', 'Medio', 'Moreno', 'Oscuro'] }, { name: 'Cabello', key: 'hair', colors: hairColors, labels: ['Oscuro', 'Castaño', 'Dorado'] }] as const).map(group => <fieldset className="color-fieldset" key={group.key}><legend>{group.name}</legend><div>{group.colors.map((color, index) => <button type="button" key={color} aria-label={`${group.name}: ${group.labels[index]}`} aria-pressed={state.appearance[group.key] === color} className={`color-swatch ${state.appearance[group.key] === color ? 'chosen' : ''}`} style={{ backgroundColor: color }} onClick={() => patch({ appearance: { ...state.appearance, [group.key]: color } })}>{state.appearance[group.key] === color && <Icon name="check" size={16}/>}</button>)}</div></fieldset>)}<button className="primary-button full-width" onClick={() => setAvatarOpen(false)}>Listo, sigamos el camino<Icon name="arrow" size={18}/></button></Modal>}
+    {exportOpen && <Modal title="Tu bitácora para llevar." onClose={() => setExportOpen(false)}><p className="modal-intro">Guarda una copia con tus ideas, próximos pasos y enlaces oficiales. Puedes llevarla a una conversación de orientación.</p><label className="sr-only" htmlFor="export-preview">Contenido de mi bitácora</label><textarea id="export-preview" className="export-preview" readOnly value={notebookText()}/><div className="export-actions"><a className="primary-button" href={`data:text/plain;charset=utf-8,${encodeURIComponent(notebookText())}`} download="mi-bitacora-entrevalles.txt"><Icon name="download" size={17}/>Descargar archivo de texto</a><button className="outline-button" onClick={async () => { try { await navigator.clipboard.writeText(notebookText()); setExportCopyStatus('Texto de la bitácora copiado. Ya puedes pegarlo donde lo necesites.') } catch { setExportCopyStatus('Selecciona el texto de la vista previa para copiarlo manualmente.') } }}>Copiar texto</button></div><p className="source-note" role="status" aria-live="polite">{exportCopyStatus}</p><p className="source-note">Si tu navegador no permite descargar archivos, puedes copiar el texto de esta vista previa.</p></Modal>}
+    {resetOpen && <Modal title="¿Empezar una nueva historia?" onClose={() => setResetOpen(false)}><p className="modal-intro">Se borrarán tu personaje, tus elecciones, notas y destinos guardados en este dispositivo. Puedes descargar tu bitácora antes.</p><div className="reset-actions"><button className="outline-button" onClick={exportNotebook}><Icon name="download" size={17}/>Descargar primero</button><button className="primary-button" onClick={() => { setState(freshJourney()); setDraftInterests(null); setComparison([]); setResetOpen(false); navigate('journey'); setToast('Tu nuevo camino está listo') }}>Sí, borrar mi recorrido</button><button className="text-button" onClick={() => setResetOpen(false)}>Conservar mi recorrido</button></div></Modal>}
+    {compareOpen && <Modal title="Pon tus opciones en perspectiva." onClose={() => setCompareOpen(false)} wide><p className="modal-intro">Compara instituciones como punto de partida. Revisa la carrera y sede exactas antes de decidir.</p><div className="compare-scroll"><table className="compare-table"><thead><tr><th>Para comparar</th>{institutions.filter(i => comparison.includes(i.id)).map(i => <th key={i.id}>{i.shortName}</th>)}</tr></thead><tbody>{(['Tipo', 'Ubicación', 'Áreas para explorar', 'Oferta y requisitos'] as const).map((row, index) => <tr key={row}><th>{row}</th>{institutions.filter(i => comparison.includes(i.id)).map(i => <td key={i.id}>{index === 0 ? i.type : index === 1 ? i.location : index === 2 ? i.areas.join(' · ') : <OfficialLink url={i.url}>Consultar oferta</OfficialLink>}</td>)}</tr>)}</tbody></table></div><p className="source-note">Duración, aranceles, acreditación aplicable y admisión se deben verificar para cada carrera y proceso. No se infieren desde el tipo de institución.</p></Modal>}
+  </>
+}
