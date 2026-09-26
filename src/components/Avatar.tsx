@@ -1,10 +1,7 @@
 import { useId } from 'react'
 
-export type AvatarAppearance = {
-  jacket: string
-  skin: string
-  hair: string
-}
+import type { AvatarAppearance } from '../lib/journey'
+export type { AvatarAppearance } from '../lib/journey'
 
 type AvatarProps = {
   appearance: AvatarAppearance
@@ -41,6 +38,7 @@ export default function Avatar({ appearance, interests, className, size = 100, p
     >
       <title id={titleId}>
         {accessories.length ? `Tu personaje con ${accessories.join(', ')}` : 'Tu personaje, listo para explorar'}
+        {`. Presentación ${appearance.presentation === 'feminine' ? 'femenina' : appearance.presentation === 'neutral' ? 'neutra' : 'masculina'}, cabello ${appearance.hairStyle === 'long' ? 'largo' : appearance.hairStyle === 'curly' ? 'rizado' : 'corto'}${appearance.glasses ? ', con lentes' : ''}`}
         {pathways.length > 0 ? `. Rutas guardadas: ${pathways.join(', ')}` : ''}
       </title>
       <ellipse cx="61" cy="153" rx="29" ry="5" fill="#183f3c" opacity=".12" />
@@ -59,6 +57,7 @@ export default function Avatar({ appearance, interests, className, size = 100, p
           <path d="M90 46c-9-2-8-9-8-9 8 0 9 8 9 8m2-9c0-8 8-10 8-10 1 7-6 10-8 10m-5 19c-9-1-11-8-11-8 9-3 12 6 12 6" fill="#759478" />
         </g>
       )}
+      {appearance.hairStyle === 'long' && <path d="M39 30c0-29 45-29 45 0l4 48c-14 8-35 7-51-1z" fill={appearance.hair}/>}
       {/* A long, relaxed silhouette keeps the character appropriate for teenagers. */}
       <path d="m42 103-1 39 11 2 11-36m-1-3 5 40 12-1 1-40" fill="#274b4c" />
       <path d="m42 136-2 12 14 1 1-12m12 0 1 12 14-1-3-12" fill="#355a59" />
@@ -77,9 +76,10 @@ export default function Avatar({ appearance, interests, className, size = 100, p
       <ellipse cx="43" cy="41" rx="4" ry="6" fill={appearance.skin} />
       <ellipse cx="78" cy="41" rx="4" ry="6" fill={appearance.skin} />
       <path d="M45 28c4 0 10-3 13-7 5 7 12 9 19 8v17c-1 11-8 16-16 16-9 0-16-7-16-17z" fill={appearance.skin} />
-      <path d="M43 34c-8-16 2-25 14-23 5-7 20-4 25 7 3 8-1 15-5 19l-1-9c-8 1-13-5-17-10-3 7-8 11-15 12z" fill={appearance.hair} />
+      {appearance.hairStyle === 'curly' ? <path d="M39 39c-9-4-10-14-4-19-3-9 5-16 13-14 6-8 16-6 21-2 11-4 20 4 19 12 10 6 7 19-4 23l-8-10c-8 1-13-5-17-10-3 7-8 11-15 12z" fill={appearance.hair}/> : <path d="M43 34c-8-16 2-25 14-23 5-7 20-4 25 7 3 8-1 15-5 19l-1-9c-8 1-13-5-17-10-3 7-8 11-15 12z" fill={appearance.hair} />}
       <path d="M53 39h1m14 0h1" stroke="#183f3c" strokeWidth="2.8" strokeLinecap="round" />
       <path d="m61 40-1 6 3 1m-8 5c3 2 6 2 9 0" stroke="#6d493a" strokeWidth="1.6" strokeLinecap="round" />
+      {appearance.glasses && <g stroke="#183f3c" strokeWidth="1.8"><rect x="47" y="34" width="12" height="11" rx="4"/><rect x="64" y="34" width="12" height="11" rx="4"/><path d="M59 38h5m-20-1h3m29 0h4"/></g>}
       {/* Collected items remain readable as independent, reversible choices. */}
       {interests.includes('build') && (
         <g>

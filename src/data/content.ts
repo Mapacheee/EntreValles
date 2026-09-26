@@ -249,6 +249,42 @@ export const militaryRoutes: MilitaryRoute[] = [
 
 export const supportOptions: SupportOption[] = [
   {
+    id: 'special-pucv', name: 'PUCV · Ingresos especiales', kind: 'Acceso especial',
+    description: 'La Pontificia Universidad Católica de Valparaíso contempla vías por rendimiento académico y trayectorias destacadas. Entre sus alternativas se encuentran talentos en arte, ciencia y deporte, liderazgo, programas educacionales y egreso de liceos técnicos. La oferta depende de la carrera y convocatoria.',
+    steps: [
+      'Identifica una vía: revisa si se basa en tus notas, una trayectoria acreditable o la participación en un programa. No todas se aplican a todas las carreras.',
+      'Prepara tus certificados académicos y los respaldos que pida la vía: logros, participación, portafolio o patrocinio deportivo, según corresponda.',
+      'En el portal de Ingresos Especiales, confirma carreras, condiciones PAES, documentos y plazos del proceso. Presenta tu postulación y revisa las comunicaciones de selección.',
+    ], url: 'https://estudiantespucv.cl/postulaciones',
+  },
+  {
+    id: 'special-uv', name: 'UV · Ingresos especiales', kind: 'Acceso especial',
+    description: 'La Universidad de Valparaíso organiza sus vías según requieran o no puntaje PAES. Incluye rendimiento académico, talentos en arte, ciencia, tecnología, humanidades y deporte; también contempla discapacidad, territorios insulares y zonas rurales de la región. Cada alternativa tiene condiciones propias.',
+    steps: [
+      'Explora la vía exacta: NEM con PAES y NEM sin puntaje mínimo PAES son alternativas diferentes. También existen vías para mujeres en determinadas áreas y colegios con convenio.',
+      'Abre la ficha de tu carrera para comprobar si ofrece cupos por esa vía. Revisa sus requisitos y cómo acreditar tu trayectoria o condición.',
+      'Completa el formulario oficial, adjunta los antecedentes y valida tu correo. Conserva el código de acceso para seguir el estado de la postulación.',
+    ], url: 'https://admision.uv.cl/ingresos-especiales',
+  },
+  {
+    id: 'special-usm', name: 'USM · Admisión especial', kind: 'Acceso especial',
+    description: 'La Universidad Técnica Federico Santa María contempla trayectorias deportivas, mujeres líderes, programas STEM y trayectoria científica escolar mediante Cupo Explora. También tiene vías asociadas al Programa Preliminar de Ingeniería y al Propedéutico USM. Haber participado no basta: cada programa establece condiciones de aprobación e ingreso.',
+    steps: [
+      'Busca tu perfil y revisa campus, sede y carrera. Las vías de deporte, por ejemplo, distinguen ramas universitarias y categorías de trayectoria deportiva.',
+      'Comprueba año de egreso, requisito NEM y exigencias PAES. Según la vía, prepara carta de motivación, currículum de logros y certificados además de tus antecedentes escolares.',
+      'Postula desde el portal oficial. Consulta cualquier discrepancia de años o requisitos con admisión antes de enviar. Los cupos +MC se gestionan por postulación centralizada, aunque aparezcan junto a estas alternativas.',
+    ], url: 'https://usm.cl/admision/admision-especial/',
+  },
+  {
+    id: 'special-upla', name: 'UPLA · Admisión especial', kind: 'Acceso especial',
+    description: 'La Universidad de Playa Ancha dispone de ingreso por antecedentes y perfiles definidos en su reglamento, incluida una vía para estudiantes destacados en enseñanza media. Para pedagogías, la información de admisión especial 2027 indica postulación mediante Habilitación Pedagógica, con requisitos específicos.',
+    steps: [
+      'Revisa los perfiles y sus documentos en la página de Admisión Especial. Si quieres una pedagogía, consulta primero los requisitos de habilitación del proceso correspondiente.',
+      'Prepara concentración de notas, licencia de enseñanza media y documento de identidad, además de los respaldos propios de tu vía. Consulta cómo postular si aún cursas cuarto medio.',
+      'Usa un correo personal para inscribirte en la plataforma oficial y verifica que los antecedentes estén completos. La selección por esta vía no implica financiar la carrera: revisa FUAS y beneficios por separado.',
+    ], url: 'https://www.upla.cl/admision/vias-de-admision/admision-especial/',
+  },
+  {
     id: 'fuas',
     name: 'FUAS · Tu primer paso',
     kind: 'Financiamiento',

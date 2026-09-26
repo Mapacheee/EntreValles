@@ -44,7 +44,7 @@ describe('restoreJourney: saved progress is untrusted input', () => {
       supports: ['gratuidad', 'fuas'],
       checkedSteps: ['compare-programs'],
       note: 'Conversar con orientación sobre opciones en Valparaíso.',
-      appearance: { jacket: jacketColors[2], skin: skinColors[0], hair: hairColors[1] },
+      appearance: { ...freshJourney().appearance, jacket: jacketColors[2], skin: skinColors[0], hair: hairColors[1] },
     }
     assert.deepEqual(restoreJourney(JSON.stringify(saved)), saved)
   })
@@ -83,7 +83,7 @@ describe('restoreJourney: saved progress is untrusted input', () => {
   it('restores valid appearance fields independently of invalid siblings', () => {
     const result = restore({ appearance: { jacket: jacketColors[1], skin: 123, hair: hairColors[2] } })
     assert.deepEqual(result.appearance, {
-      jacket: jacketColors[1], skin: freshJourney().appearance.skin, hair: hairColors[2],
+      ...freshJourney().appearance, jacket: jacketColors[1], skin: freshJourney().appearance.skin, hair: hairColors[2],
     })
   })
 
@@ -204,4 +204,17 @@ describe('journey actions', () => {
       assert.strictEqual(completeStation(initial, id), initial)
     }
   })
+})
+
+// Existing saved characters must survive the additional customization fields.
+it('migrates old avatars and validates new appearance choices', () => {
+  const old = restore({ appearance: { jacket: jacketColors[1], skin: skinColors[2], hair: hairColors[2] }, note: 'Mi plan' })
+  assert.equal(old.appearance.hairStyle, 'short')
+  assert.equal(old.note, 'Mi plan')
+  for (const presentation of ['masculine', 'feminine', 'neutral']) {
+    const value = { ...freshJourney(), appearance: { ...freshJourney().appearance, presentation, hairStyle: 'long', glasses: true } }
+    assert.deepEqual(restoreJourney(JSON.stringify(value)), value)
+  }
+  const invalid = restore({ appearance: { presentation: 'invalid', hairStyle: 'invalid', glasses: 'true' } })
+  assert.deepEqual(invalid.appearance, freshJourney().appearance)
 })

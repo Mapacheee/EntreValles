@@ -68,6 +68,29 @@ input[type='checkbox'] { accent-color: var(--school-blue); }
 .site-footer { border-color: var(--line); color: var(--school-slate); }
 .school-website { display: inline-flex; align-items: center; gap: 6px; color: var(--school-blue); text-underline-offset: 4px; }
 .school-website:hover { color: var(--school-navy); }
+.optional-route { min-height: 78px; padding: 15px 12px; border: 1px solid #a9bfce; border-radius: 9px; background: #eaf1f6; color: var(--school-blue); font-size: 14px; font-weight: 600; gap: 12px; }
+.optional-route > svg:first-child { width: 25px; height: 25px; }
+.optional-route small { margin-top: 4px; font-size: 11px; font-weight: 400; color: #536879; }
+.optional-route:hover, .optional-route.selected { border-color: var(--school-blue); background: #dce9f2; color: var(--school-navy); }
+.service-entry { min-height: 52px; padding: 14px 20px; font-size: 13px; background: #eaf1f6; }
+.scene-station.is-optional { width: 52px; height: 52px; }
+.scene-station.is-optional .scene-station-number { width: 37px; height: 37px; font-size: 16px; }
+.scene-station.is-optional .scene-station-label { top: 47px; }
+.scene-station.is-optional .scene-station-optional { top: 73px; }
+.admissions-intro { padding: 20px; margin: 24px 0 16px; border-left: 3px solid var(--school-blue); border-radius: 0 9px 9px 0; background: #edf3f7; }
+.admissions-intro h3, .access-programs-title { font-family: var(--serif); font-size: 21px; color: var(--ink); font-weight: 400; line-height: 1.4; }
+.admissions-intro p { font-size: 12px; line-height: 1.8; color: var(--muted); }
+.admissions-intro p:last-child { margin-bottom: 0; }
+.access-programs-title { margin-top: 32px; }
+.avatar-options { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
+.avatar-options legend { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.avatar-options p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.avatar-options > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.avatar-options .choice-chip { width: auto; flex: 1; justify-content: center; }
+.avatar-options button[aria-pressed='true'] { background: #e0edf5; border-color: var(--school-blue); color: var(--school-blue); box-shadow: inset 0 0 0 1px var(--school-blue); }
+.avatar-glasses { display: flex; gap: 10px; align-items: center; font-size: 13px; margin-bottom: 24px; min-height: 44px; }
+.modal:has(.avatar-options) .customize-preview { position: sticky; top: 0; z-index: 2; min-height: 145px; padding: 10px; background: #eaf0f5; box-shadow: 0 5px 14px #121d3012; }
+.modal:has(.avatar-options) .customize-preview > svg { width: 94px; }
 
 @media (max-width: 640px) {
   .brand { gap: 4px; }

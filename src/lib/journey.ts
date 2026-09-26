@@ -6,6 +6,14 @@ export const motivationOptions = ['Aprender algo que me interese', 'Tener más h
 export const jacketColors = ['#ce7859', '#527a78', '#c4a358', '#7f7192']
 export const skinColors = ['#efc5a2', '#c68e63', '#895c43', '#573e34']
 export const hairColors = ['#293d36', '#714e35', '#b18042']
+export const presentations = ['masculine', 'feminine', 'neutral'] as const
+export const hairStyles = ['short', 'long', 'curly'] as const
+export interface AvatarAppearance {
+  jacket: string; skin: string; hair: string
+  presentation: typeof presentations[number]
+  hairStyle: typeof hairStyles[number]
+  glasses: boolean
+}
 export interface JourneyState {
   version: 1
   station: StationId
@@ -19,10 +27,10 @@ export interface JourneyState {
   supports: string[]
   checkedSteps: string[]
   note: string
-  appearance: { jacket: string; skin: string; hair: string }
+  appearance: AvatarAppearance
 }
 export function freshJourney(): JourneyState {
-  return { version: 1, station: 'start', course: '', startStep: 0, motivations: [], concern: '', interests: [], completed: [], favorites: [], supports: [], checkedSteps: [], note: '', appearance: { jacket: jacketColors[0], skin: skinColors[1], hair: hairColors[0] } }
+  return { version: 1, station: 'start', course: '', startStep: 0, motivations: [], concern: '', interests: [], completed: [], favorites: [], supports: [], checkedSteps: [], note: '', appearance: { jacket: jacketColors[0], skin: skinColors[1], hair: hairColors[0], presentation: 'masculine', hairStyle: 'short', glasses: false } }
 }
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value)
 const strings = (value: unknown, max = 30): string[] => Array.isArray(value) ? [...new Set(value.filter((v): v is string => typeof v === 'string' && v.length <= 150))].slice(0, max) : []
@@ -42,7 +50,7 @@ export function restoreJourney(raw: string | null): JourneyState {
       completed: strings(v.completed, Infinity).filter(id => stationIds.includes(id as StationId)),
       favorites: strings(v.favorites), supports: strings(v.supports), checkedSteps: strings(v.checkedSteps),
       note: typeof v.note === 'string' ? v.note.slice(0, 2000) : '',
-      appearance: { jacket: jacketColors.includes(appearance.jacket as string) ? appearance.jacket as string : initial.appearance.jacket, skin: skinColors.includes(appearance.skin as string) ? appearance.skin as string : initial.appearance.skin, hair: hairColors.includes(appearance.hair as string) ? appearance.hair as string : initial.appearance.hair },
+      appearance: { presentation: presentations.includes(appearance.presentation as AvatarAppearance['presentation']) ? appearance.presentation as AvatarAppearance['presentation'] : initial.appearance.presentation, hairStyle: hairStyles.includes(appearance.hairStyle as AvatarAppearance['hairStyle']) ? appearance.hairStyle as AvatarAppearance['hairStyle'] : initial.appearance.hairStyle, glasses: typeof appearance.glasses === 'boolean' ? appearance.glasses : false, jacket: jacketColors.includes(appearance.jacket as string) ? appearance.jacket as string : initial.appearance.jacket, skin: skinColors.includes(appearance.skin as string) ? appearance.skin as string : initial.appearance.skin, hair: hairColors.includes(appearance.hair as string) ? appearance.hair as string : initial.appearance.hair },
     }
   } catch { return initial }
 }
