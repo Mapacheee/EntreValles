@@ -102,6 +102,78 @@ export const institutions: Institution[] = [
     color: '#817192',
   },
   {
+    id: 'uai',
+    name: 'Universidad Adolfo Ibáñez',
+    shortName: 'UAI',
+    type: 'Universidad',
+    location: 'Viña del Mar',
+    description:
+      'Campus ubicado en Viña del Mar enfocado en formación en negocios, ingeniería, derecho, psicología y comunicaciones. Conoce su modelo formativo y requisitos de admisión.',
+    areas: ['Administración', 'Ingeniería', 'Ciencias sociales', 'Diseño'],
+    url: 'https://admision.uai.cl/',
+    color: '#2b4c6f',
+  },
+  {
+    id: 'unab',
+    name: 'Universidad Andrés Bello',
+    shortName: 'UNAB',
+    type: 'Universidad',
+    location: 'Viña del Mar',
+    description:
+      'Sede en Viña del Mar con amplia oferta en ciencias de la salud, ingenierías, derecho, ciencias sociales y educación. Institución adscrita a gratuidad.',
+    areas: ['Salud', 'Ingeniería', 'Ciencias sociales', 'Educación', 'Ciencias'],
+    url: 'https://admision.unab.cl/sedes/vina-del-mar/',
+    color: '#8c3241',
+  },
+  {
+    id: 'uvm',
+    name: 'Universidad Viña del Mar',
+    shortName: 'UVM',
+    type: 'Universidad',
+    location: 'Viña del Mar',
+    description:
+      'Universidad regional con campus Rodelillo, Miraflores y Diego Portales. Imparte programas en salud, veterinaria y agronomía, arquitectura, educación y gestión. Adscrita a gratuidad.',
+    areas: ['Salud', 'Ciencias', 'Diseño', 'Educación', 'Ciencias sociales'],
+    url: 'https://www.uvm.cl/admision/',
+    color: '#345e7d',
+  },
+  {
+    id: 'ust',
+    name: 'Universidad Santo Tomás',
+    shortName: 'UST',
+    type: 'Universidad',
+    location: 'Viña del Mar',
+    description:
+      'Sede Viña del Mar con carreras en salud, ciencias sociales, educación y administración. Forma parte del sistema de acceso centralizado y está adscrita a gratuidad.',
+    areas: ['Salud', 'Ciencias sociales', 'Educación', 'Administración'],
+    url: 'https://www.santotomas.cl/sedes/vina-del-mar/',
+    color: '#3e7054',
+  },
+  {
+    id: 'udla',
+    name: 'Universidad de Las Américas',
+    shortName: 'UDLA',
+    type: 'Universidad',
+    location: 'Viña del Mar',
+    description:
+      'Campus Los Castaños en Viña del Mar con formación en salud, ciencias sociales, derecho y administración en distintas jornadas. Adscrita a gratuidad.',
+    areas: ['Salud', 'Ciencias sociales', 'Administración', 'Educación'],
+    url: 'https://admision.udla.cl/',
+    color: '#9e443b',
+  },
+  {
+    id: 'uac',
+    name: 'Universidad de Aconcagua',
+    shortName: 'UAC',
+    type: 'Universidad',
+    location: 'San Felipe, Los Andes, Quillota, La Calera y Viña del Mar',
+    description:
+      'Institución con presencia en el Valle de Aconcagua, la provincia de Quillota y la costa. Imparte carreras orientadas a inserción laboral y continuidad de estudios.',
+    areas: ['Salud', 'Administración', 'Tecnología', 'Ciencias sociales'],
+    url: 'https://www.uaconcagua.cl/',
+    color: '#64748b',
+  },
+  {
     id: 'duoc',
     name: 'Instituto Profesional Duoc UC',
     shortName: 'Duoc UC',
@@ -283,6 +355,33 @@ export const supportOptions: SupportOption[] = [
       'Prepara concentración de notas, licencia de enseñanza media y documento de identidad, además de los respaldos propios de tu vía. Consulta cómo postular si aún cursas cuarto medio.',
       'Usa un correo personal para inscribirte en la plataforma oficial y verifica que los antecedentes estén completos. La selección por esta vía no implica financiar la carrera: revisa FUAS y beneficios por separado.',
     ], url: 'https://www.upla.cl/admision/vias-de-admision/admision-especial/',
+  },
+  {
+    id: 'special-uai', name: 'UAI · Admisión especial', kind: 'Acceso especial',
+    description: 'La Universidad Adolfo Ibáñez contempla vías de admisión especial y directa por rendimiento escolar (NEM destacado), deportistas de alto rendimiento, bachilleratos internacionales y emprendimiento. Consulta qué vías exigen o no puntaje PAES.',
+    steps: [
+      'Revisa las vías de admisión especial vigentes y los cupos disponibles para el Campus Viña del Mar.',
+      'Reúne tu concentración de notas, certificados de logros o acreditación según la vía correspondiente.',
+      'Postula en el portal de admisión UAI en los plazos establecidos y sigue el calendario de selección.',
+    ], url: 'https://admision.uai.cl/admision-especial/',
+  },
+  {
+    id: 'special-unab', name: 'UNAB · Admisión especial', kind: 'Acceso especial',
+    description: 'La Universidad Andrés Bello cuenta con vías de admisión especial por rendimiento académico en enseñanza media, deportistas destacados, traslados y pruebas de procesos anteriores. La institución está adscrita al beneficio de gratuidad.',
+    steps: [
+      'Identifica la vía de ingreso y verifica si la carrera que te interesa en la sede Viña del Mar dispone de cupos.',
+      'Prepara tus antecedentes académicos (licencia de enseñanza media, certificado NEM) y documentos requeridos.',
+      'Completa tu solicitud en la plataforma de admisión especial UNAB y consulta las opciones de financiamiento.',
+    ], url: 'https://admision.unab.cl/admision-especial/',
+  },
+  {
+    id: 'special-uvm', name: 'UVM · Admisión especial', kind: 'Acceso especial',
+    description: 'La Universidad Viña del Mar dispone de vías de ingreso especial y directo para egresados de enseñanza media, deportistas, trabajadores y personas con estudios previos. La institución participa de la gratuidad universitaria.',
+    steps: [
+      'Revisa las modalidades de admisión especial y confirma la oferta para la carrera y campus de tu interés.',
+      'Adjunta tu cédula de identidad, concentración de notas y los respaldos solicitados por la vía.',
+      'Formaliza tu postulación en el portal de la UVM y consulta la postulación al FUAS para beneficios estatales.',
+    ], url: 'https://www.uvm.cl/admision/vias-de-admision/',
   },
   {
     id: 'fuas',
